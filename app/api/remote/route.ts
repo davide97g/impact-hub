@@ -22,14 +22,14 @@ export async function POST(request: Request) {
 
     try {
       await sql(
-        `INSERT INTO public."Scores" (repository, user, score) VALUES ${scores
+        `INSERT INTO public."Scores" (repository, username, score) VALUES ${scores
           .map(
             (score) =>
               `('${payload.repository.name}', '${score.user}', ${score.score})`
           )
           .join(
             ", "
-          )} ON CONFLICT (repository, user) DO UPDATE SET score = EXCLUDED.score;`
+          )} ON CONFLICT (repository, username) DO UPDATE SET score = EXCLUDED.score;`
       );
     } catch (error) {
       console.error("Database error:", error);
