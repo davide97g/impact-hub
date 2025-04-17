@@ -27,7 +27,9 @@ export async function POST(request: Request) {
             (score) =>
               `('${payload.repository.name}', '${score.user}', ${score.score})`
           )
-          .join(", ")}`
+          .join(
+            ", "
+          )} ON CONFLICT (repository, user) DO UPDATE SET score = EXCLUDED.score;`
       );
     } catch (error) {
       console.error("Database error:", error);
