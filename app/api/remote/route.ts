@@ -1,16 +1,14 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { type NextRequest, NextResponse } from "next/server";
 
-export default async function POST(req: NextApiRequest, res: NextApiResponse) {
+// This is a proxy for GitHub API requests to avoid exposing the token to the client
+export async function POST(request: NextRequest) {
   try {
-    const payload = req.body;
-
-    // Log repository and user information
-    console.log("Repository Info:", payload.repository);
-    console.log("User Info:", payload.sender);
-
-    res.status(200).json({ message: "Webhook received successfully" });
+    console.info("Received webhook data", request);
+    const body = await request.json();
+    console.log("Webhook data received:", body);
+    return NextResponse.json({ message: "Data logged successfully" });
   } catch (error) {
-    console.error("Error handling webhook:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("Error logging webhook data:", error);
+    return NextResponse.json({ error: "Failed to log data" }, { status: 500 });
   }
 }
