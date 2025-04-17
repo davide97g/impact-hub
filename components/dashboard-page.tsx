@@ -18,7 +18,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Github, LogOut, Search } from "lucide-react";
+import { LogOut, Search } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -93,8 +94,14 @@ export function DashboardPage({
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="flex justify-between items-center mb-8">
-        <div className="flex items-center">
-          <Github className="h-8 w-8 mr-2" />
+        <div className="flex items-center gap-2">
+          <Image
+            className="rounded-full border-2 border-gray-300"
+            src={"/favicon.ico"}
+            height={50}
+            width={50}
+            alt="website-logo"
+          />
           <h1 className="text-2xl font-bold">GitHub Repository Analyzer</h1>
         </div>
         {initialUser && (

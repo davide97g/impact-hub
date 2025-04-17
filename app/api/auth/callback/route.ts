@@ -60,6 +60,30 @@ export async function GET(request: NextRequest) {
       sameSite: "lax",
     });
 
+    const installations = await fetch(
+      "https://api.github.com/user/installations",
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/vnd.github+json",
+        },
+      }
+    );
+
+    const { installations: apps } = await installations.json();
+
+    const yourAppInstalled = apps.some(
+      (app: any) => app.app_slug === "impact-hub-test"
+    );
+
+    console.log("Your app installed:", yourAppInstalled);
+
+    if (!yourAppInstalled) {
+      // Redirect to install page
+      const installUrl = `https://github.com/apps/impact-hub-test/installations/new?redirect_uri=${process.env.NEXT_PUBLIC_APP_URL}/dashboard`;
+      return NextResponse.redirect(installUrl);
+    }
+
     // Redirect to the dashboard
     return NextResponse.redirect(new URL("/dashboard", request.url));
   } catch (error) {

@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeft, Download, Github, RefreshCw } from "lucide-react";
+import { ArrowLeft, Download, Github, RefreshCw, Webhook } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -187,6 +187,33 @@ export function RepositoryAnalyzerPage({
     URL.revokeObjectURL(url);
   };
 
+  const handleCreateWebhook = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/github/webhooks/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          owner,
+          repo,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create webhook");
+      }
+      const data = await response.json();
+      console.log("Webhook created:", data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error creating webhook:", error);
+      setError("Failed to create webhook. Please try again later.");
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="flex items-center mb-8">
@@ -271,13 +298,17 @@ export function RepositoryAnalyzerPage({
             </Table>
           )}
         </CardContent>
-        <CardFooter className="flex justify-end">
+        <CardFooter className="flex justify-end gap-2">
           <Button
             onClick={handleExportJSON}
             disabled={loading || contributors.length === 0}
           >
             <Download className="h-4 w-4 mr-2" />
             Export as JSON
+          </Button>
+          <Button onClick={handleCreateWebhook} disabled={loading}>
+            <Webhook className="h-4 w-4 mr-2" />
+            Create Webhook
           </Button>
         </CardFooter>
       </Card>

@@ -27,11 +27,11 @@ export function LoginPage({ clientId }: LoginPageProps) {
   const redirectUri = `${
     process.env.NEXT_PUBLIC_APP_URL || window.location.origin
   }/api/auth/callback`;
-  const scope = "repo"; // Read-only access to repositories
+  const requiredScopes = "admin:repo_hook";
 
   const handleLogin = () => {
     setIsLoading(true);
-    const authUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
+    const authUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${requiredScopes}`;
     router.push(authUrl);
   };
 

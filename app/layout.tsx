@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   title: "GitHub Repository Analyzer",
   description:
     "Analyze GitHub repositories and calculate contributor impact scores",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
