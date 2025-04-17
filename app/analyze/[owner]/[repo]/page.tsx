@@ -5,9 +5,9 @@ import { redirect } from "next/navigation";
 export default async function AnalyzePage({
   params,
 }: {
-  params: { owner: string; repo: string };
+  params: Promise<{ owner: string; repo: string }>;
 }) {
-  const { owner, repo } = params;
+  const { owner, repo } = await params;
 
   // Check if user is authenticated
   const cookieStore = await cookies();
