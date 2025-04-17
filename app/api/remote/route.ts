@@ -20,10 +20,10 @@ export async function POST(request: Request) {
       token: process.env.GITHUB_TOKEN,
     });
 
-    await sql`INSERT INTO public."Scores" (repository, username, score) VALUES ${scores
+    await sql`INSERT INTO public."Scores" (owner, repository, username, score) VALUES ${scores
       .map(
         (score) =>
-          `('${payload.repository.name}', '${score.user}', ${score.score})`
+          `('${payload.repository.owner.login}', '${payload.repository.name}', '${score.user}', ${score.score})`
       )
       .join(
         ", "
