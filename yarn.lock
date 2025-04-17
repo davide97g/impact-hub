@@ -2438,7 +2438,7 @@ __metadata:
     postcss: "npm:^8.5.3"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
-    reputation-scoring: "npm:^0.0.3"
+    reputation-scoring: "npm:^0.0.4"
     tailwind-merge: "npm:^1.14.0"
     tailwindcss: "npm:^4.1.4"
     tailwindcss-animate: "npm:^1.0.7"
@@ -3680,12 +3680,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"reputation-scoring@npm:^0.0.3":
-  version: 0.0.3
-  resolution: "reputation-scoring@npm:0.0.3"
+"reputation-scoring@npm:^0.0.4":
+  version: 0.0.4
+  resolution: "reputation-scoring@npm:0.0.4"
   dependencies:
     octokit: "npm:^4.1.2"
-  checksum: 10c0/0856e5d6f67d632b5de55820515023972c948628b132c1199b62d2d0a67acc874b5e86670c3b56d9431bd9ffce2594c3c042d61718593928289541b116160cdc
+  checksum: 10c0/7651c7c1f71bb7f94f795d3da749fafc0916abab009965f68b8164e090d5db779ad5432d7665bd9b55c5ccda8fcfe79cb0a3a25f435701b56ccd33974b1aaa51
   languageName: node
   linkType: hard
 
