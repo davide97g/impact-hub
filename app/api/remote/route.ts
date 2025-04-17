@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { computeReputationScoring } from "reputation-scoring";
 
 export async function POST(request: Request) {
   try {
@@ -12,11 +13,18 @@ export async function POST(request: Request) {
 
     // Here you would process the webhook data
     // For example, trigger a new analysis, update database records, etc.
+    const scores = await computeReputationScoring({
+      repo: payload.repository.name,
+      owner: payload.repository.owner.login,
+      token: process.env.GITHUB_TOKEN,
+    });
 
     // For now, we'll just log it and return a success response
     return NextResponse.json({
       success: true,
-      message: `Processed ${githubEvent} webhook`,
+      message: `Processed ${githubEvent} webhook for ${
+        payload.repository.name
+      }: ${scores.map((score) => `${score.user}: ${score.score}`)}`,
     });
   } catch (error) {
     console.error("Error processing webhook:", error);
