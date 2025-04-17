@@ -20,24 +20,14 @@ export async function POST(request: Request) {
       token: process.env.GITHUB_TOKEN,
     });
 
-    try {
-      await sql(
-        `INSERT INTO public."Scores" (repository, username, score) VALUES ${scores
-          .map(
-            (score) =>
-              `('${payload.repository.name}', '${score.user}', ${score.score})`
-          )
-          .join(
-            ", "
-          )} ON CONFLICT (repository, username) DO UPDATE SET score = EXCLUDED.score;`
-      );
-    } catch (error) {
-      console.error("Database error:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
-    }
+    await sql`INSERT INTO public."Scores" (repository, username, score) VALUES ${scores
+      .map(
+        (score) =>
+          `('${payload.repository.name}', '${score.user}', ${score.score})`
+      )
+      .join(
+        ", "
+      )} ON CONFLICT (repository, username) DO UPDATE SET score = EXCLUDED.score;`;
 
     // Handle the webhook based on the event type
 
