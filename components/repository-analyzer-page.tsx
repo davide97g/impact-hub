@@ -50,6 +50,8 @@ export function RepositoryAnalyzerPage({
   const router = useRouter();
 
   useEffect(() => {
+    console.log({ initialContributors, initialRepoDetails });
+
     if (initialContributors.length > 0) {
       analyzeContributors(initialContributors);
     } else {
@@ -124,11 +126,13 @@ export function RepositoryAnalyzerPage({
 
           // Calculate impact score (this is a simplified formula)
           // In a real app, you might use a more sophisticated algorithm
-          const impactScore =
-            (contributor.contributions * 0.4 +
-              totalAdditions * 0.4 +
-              totalDeletions * 0.2) /
-            100;
+          const res = await fetch(`/api/score/${repo}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+          const impactScore = await res.json();
 
           return {
             login: contributor.login,
@@ -137,7 +141,7 @@ export function RepositoryAnalyzerPage({
             additions: totalAdditions,
             deletions: totalDeletions,
             commits: commitsData.length,
-            impactScore: Number.parseFloat(impactScore.toFixed(2)),
+            impactScore: impactScore.res.score,
           };
         })
       );
@@ -299,6 +303,27 @@ export function RepositoryAnalyzerPage({
           )}
         </CardContent>
         <CardFooter className="flex justify-end gap-2">
+          <Button
+            onClick={() => {
+              fetch(`/api/update-score`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  owner,
+                  repo,
+                }),
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  console.log({ data });
+                });
+            }}
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
           <Button
             onClick={handleExportJSON}
             disabled={loading || contributors.length === 0}
