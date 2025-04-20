@@ -16,12 +16,12 @@ export async function POST(request: Request) {
       repo,
       token: sessionCookie?.value,
     });
-    console.log({ score });
+    console.log({ user: score[0].user, score: score[0].score, repo, owner });
 
     const res = sql`SELECT * FROM public."Scores" WHERE repository = ${repo} AND owner = ${owner}`;
 
     if ((await res).length > 0) {
-      await sql`UPDATE public."Scores" SET username = ${score[0].user} score = ${score[0].score} WHERE repository = ${repo} AND owner = ${owner}`;
+      await sql`UPDATE public."Scores" SET score = ${score[0].score} WHERE repository = ${repo} AND username = ${owner}`;
     } else {
       await sql`INSERT INTO public."Scores" (repository, owner, username, score) VALUES (${repo}, ${owner}, ${score[0].user}, ${score[0].score})`;
     }

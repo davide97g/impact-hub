@@ -19,6 +19,8 @@ import {
 import { ArrowLeft, Download, Github, RefreshCw, Webhook } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { CommitData } from "../types/api.types";
+import { fetchCommits } from "@/services/fetchContribute";
 
 interface Contributor {
   login: string;
@@ -111,11 +113,18 @@ export function RepositoryAnalyzerPage({
             };
           }
 
-          const commitsData = await commitsResponse.json();
+          const commitsData: CommitData[] = await commitsResponse.json();
 
           // Calculate stats
           let totalAdditions = 0;
           let totalDeletions = 0;
+          console.log({
+            commitsData,
+            formatted: commitsData.map((c) => c.url),
+          });
+
+          const { additions, deletions } = await fetchCommits(commitsData);
+          console.log({ additions, deletions });
 
           // In a real app, you would fetch detailed stats for each commit
           // For this demo, we'll use random values
@@ -138,8 +147,8 @@ export function RepositoryAnalyzerPage({
             login: contributor.login,
             avatar_url: contributor.avatar_url,
             contributions: contributor.contributions,
-            additions: totalAdditions,
-            deletions: totalDeletions,
+            additions,
+            deletions,
             commits: commitsData.length,
             impactScore: impactScore.res.score,
           };
@@ -305,6 +314,7 @@ export function RepositoryAnalyzerPage({
         <CardFooter className="flex justify-end gap-2">
           <Button
             onClick={() => {
+              setLoading(true);
               fetch(`/api/update-score`, {
                 method: "POST",
                 headers: {
@@ -318,6 +328,10 @@ export function RepositoryAnalyzerPage({
                 .then((res) => res.json())
                 .then((data) => {
                   console.log({ data });
+                })
+                .finally(() => {
+                  setLoading(false);
+                  fetchContributors();
                 });
             }}
           >
