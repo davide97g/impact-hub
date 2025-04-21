@@ -44,8 +44,9 @@ export function RepositoryAnalyzerPage({
   repo,
   initialRepoDetails,
   initialContributors,
-}: RepositoryAnalyzerPageProps) {
+}: Readonly<RepositoryAnalyzerPageProps>) {
   const [contributors, setContributors] = useState<Contributor[]>([]);
+  const [commitsData, setCommitsData] = useState<CommitData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [repoDetails, setRepoDetails] = useState<any>(initialRepoDetails);
@@ -113,25 +114,8 @@ export function RepositoryAnalyzerPage({
             };
           }
 
-          const commitsData: CommitData[] = await commitsResponse.json();
-
-          // Calculate stats
-          let totalAdditions = 0;
-          let totalDeletions = 0;
-          console.log({
-            commitsData,
-            formatted: commitsData.map((c) => c.url),
-          });
-
-          const { additions, deletions } = await fetchCommits(commitsData);
-          console.log({ additions, deletions });
-
-          // In a real app, you would fetch detailed stats for each commit
-          // For this demo, we'll use random values
-          commitsData.forEach(() => {
-            totalAdditions += Math.floor(Math.random() * 100);
-            totalDeletions += Math.floor(Math.random() * 50);
-          });
+          const commitsDataInfo: CommitData[] = await commitsResponse.json();
+          setCommitsData(commitsDataInfo);
 
           // Calculate impact score (this is a simplified formula)
           // In a real app, you might use a more sophisticated algorithm
@@ -141,16 +125,16 @@ export function RepositoryAnalyzerPage({
               "Content-Type": "application/json",
             },
           });
-          const impactScore = await res.json();
+          const contributionScore = await res.json();
 
           return {
             login: contributor.login,
             avatar_url: contributor.avatar_url,
             contributions: contributor.contributions,
-            additions,
-            deletions,
-            commits: commitsData.length,
-            impactScore: impactScore.res.score,
+            additions: contributionScore.res.additions,
+            deletions: contributionScore.res.deletions,
+            commits: commitsDataInfo.length,
+            impactScore: contributionScore.res.score,
           };
         })
       );
@@ -323,6 +307,7 @@ export function RepositoryAnalyzerPage({
                 body: JSON.stringify({
                   owner,
                   repo,
+                  commitsData,
                 }),
               })
                 .then((res) => res.json())
