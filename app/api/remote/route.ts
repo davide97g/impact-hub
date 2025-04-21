@@ -20,6 +20,17 @@ export async function POST(request: Request) {
       token: process.env.GITHUB_TOKEN,
     });
 
+    await sql`INSERT INTO public."Scores" (owner, repository, username, score) VALUES ${scores
+      .map(
+        (score) =>
+          `('${payload.repository.owner.login}', '${payload.repository.name}', '${score.user}', ${score.score})`
+      )
+      .join(
+        ", "
+      )} ON CONFLICT (repository, username) DO UPDATE SET score = EXCLUDED.score;`;
+
+    // Handle the webhook based on the event type
+
     // For now, we'll just log it and return a success response
     return NextResponse.json({
       success: true,
