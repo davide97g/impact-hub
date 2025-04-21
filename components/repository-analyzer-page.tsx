@@ -27,7 +27,7 @@ interface Contributor {
   contributions: number;
   additions: number;
   deletions: number;
-  commits: any;
+  commits: number;
   impactScore: number;
 }
 
@@ -52,8 +52,18 @@ export function RepositoryAnalyzerPage({
   const [repoDetails, setRepoDetails] = useState<any>(initialRepoDetails);
   const router = useRouter();
 
+  console.log({
+    contributors,
+    loading,
+    isLoadingRefresh,
+    initialContributors,
+    initialRepoDetails,
+  });
+
   useEffect(() => {
     if (initialContributors.length > 0) {
+      console.log("1");
+
       analyzeContributors(initialContributors);
     } else {
       fetchContributors();
@@ -83,6 +93,7 @@ export function RepositoryAnalyzerPage({
         throw new Error("Failed to fetch contributors");
       }
       const contributorsData = await contributorsResponse.json();
+      console.log("2");
 
       analyzeContributors(contributorsData);
     } catch (error) {
@@ -95,7 +106,9 @@ export function RepositoryAnalyzerPage({
   const analyzeContributors = async (contributorsData: any[]) => {
     try {
       // For each contributor, fetch additional stats
-      await Promise.all(
+      console.log({ contributorsData });
+
+      const cotributorsWithStats = await Promise.all(
         contributorsData.map(async (contributor: any) => {
           // Fetch commit stats for this contributor
           const commitsResponse = await fetch(
@@ -135,22 +148,20 @@ export function RepositoryAnalyzerPage({
             },
           });
           const contributionScore = await res.json();
+          console.log({ contributors });
 
-          setContributors((prev) => [
-            ...prev,
-            {
-              login: contributor.login,
-              avatar_url: contributor.avatar_url,
-              contributions: contributor.contributions,
-              additions: contributionScore.res[0]?.additions,
-              deletions: contributionScore.res[0]?.deletions,
-              commits: contributionScore.res[0]?.commits,
-              impactScore: contributionScore.res[0]?.score,
-            },
-          ]);
+          return {
+            login: contributor.login,
+            avatar_url: contributor.avatar_url,
+            contributions: contributor.contributions,
+            additions: contributionScore.res[0]?.additions,
+            deletions: contributionScore.res[0]?.deletions,
+            commits: contributionScore.res[0]?.commits,
+            impactScore: contributionScore.res[0]?.score,
+          };
         })
       );
-
+      setContributors(cotributorsWithStats);
       setLoading(false);
     } catch (error) {
       console.error("Error analyzing contributors:", error);
@@ -259,57 +270,63 @@ export function RepositoryAnalyzerPage({
             </div>
           ) : (
             <>
-              {contributors.length === 0 && (
-                <div className="text-center py-4">No contributors found</div>
-              )}
-              {contributors.length > 0 && (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Contributor</TableHead>
-                      <TableHead className="text-right">Commits</TableHead>
-                      <TableHead className="text-right">Additions</TableHead>
-                      <TableHead className="text-right">Deletions</TableHead>
-                      <TableHead className="text-right">Impact Score</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {contributors
-                      .sort(
-                        (a: Contributor, b: Contributor) =>
-                          b.impactScore - a.impactScore
-                      )
-                      .map((contributor) => (
-                        <TableRow key={contributor.login}>
-                          <TableCell className="font-medium">
-                            <div className="flex items-center">
-                              <img
-                                src={
-                                  contributor.avatar_url || "/placeholder.svg"
-                                }
-                                alt={contributor.login}
-                                className="w-8 h-8 rounded-full mr-2"
-                              />
-                              {contributor.login}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {contributor.commits}
-                          </TableCell>
-                          <TableCell className="text-right text-green-500">
-                            +{contributor.additions}
-                          </TableCell>
-                          <TableCell className="text-right text-red-500">
-                            -{contributor.deletions}
-                          </TableCell>
-                          <TableCell className="text-right font-bold">
-                            {contributor.impactScore}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                  </TableBody>
-                </Table>
-              )}
+              {contributors.length === 0 ||
+                (contributors.some((contributor) => !contributor.commits) && (
+                  <div className="text-center py-4">
+                    No contributors found, try to refresh the stats
+                  </div>
+                ))}
+              {contributors.length > 0 &&
+                contributors.every((contributor) => contributor.commits) && (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Contributor</TableHead>
+                        <TableHead className="text-right">Commits</TableHead>
+                        <TableHead className="text-right">Additions</TableHead>
+                        <TableHead className="text-right">Deletions</TableHead>
+                        <TableHead className="text-right">
+                          Impact Score
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {contributors
+                        .sort(
+                          (a: Contributor, b: Contributor) =>
+                            b.impactScore - a.impactScore
+                        )
+                        .map((contributor) => (
+                          <TableRow key={contributor.login}>
+                            <TableCell className="font-medium">
+                              <div className="flex items-center">
+                                <img
+                                  src={
+                                    contributor.avatar_url || "/placeholder.svg"
+                                  }
+                                  alt={contributor.login}
+                                  className="w-8 h-8 rounded-full mr-2"
+                                />
+                                {contributor.login}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {contributor.commits}
+                            </TableCell>
+                            <TableCell className="text-right text-green-500">
+                              +{contributor.additions}
+                            </TableCell>
+                            <TableCell className="text-right text-red-500">
+                              -{contributor.deletions}
+                            </TableCell>
+                            <TableCell className="text-right font-bold">
+                              {contributor.impactScore}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                )}
             </>
           )}
         </CardContent>
