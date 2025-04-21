@@ -5,8 +5,6 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { computeReputationScoring } from "reputation-scoring";
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
-
 export async function POST(request: Request) {
   try {
     const body = await request.json();
