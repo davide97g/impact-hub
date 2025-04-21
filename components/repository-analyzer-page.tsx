@@ -45,14 +45,13 @@ export function RepositoryAnalyzerPage({
   initialContributors,
 }: Readonly<RepositoryAnalyzerPageProps>) {
   const [contributors, setContributors] = useState<Contributor[]>([]);
-  const [commitsData, setCommitsData] = useState<CommitData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [repoDetails, setRepoDetails] = useState<any>(initialRepoDetails);
   const router = useRouter();
 
-  console.log({ loading, isLoadingRefresh });
+  console.log({ contributors });
 
   useEffect(() => {
     if (initialContributors.length > 0) {
@@ -99,35 +98,6 @@ export function RepositoryAnalyzerPage({
       // For each contributor, fetch additional stats
       await Promise.all(
         contributorsData.map(async (contributor: any) => {
-          // Fetch commit stats for this contributor
-          const commitsResponse = await fetch(
-            `/api/github/repos/${owner}/${repo}/commits?author=${contributor.login}&per_page=100`
-          );
-
-          if (!commitsResponse.ok) {
-            return {
-              ...contributor,
-              additions: 0,
-              deletions: 0,
-              commits: 0,
-              impactScore: 0,
-            };
-          }
-
-          const commitsDataInfo: CommitData[] = await commitsResponse.json();
-          setCommitsData(commitsDataInfo);
-
-          // Calculate stats
-          let totalAdditions = 0;
-          let totalDeletions = 0;
-
-          // In a real app, you would fetch detailed stats for each commit
-          // For this demo, we'll use random values
-          commitsData.forEach(() => {
-            totalAdditions += Math.floor(Math.random() * 100);
-            totalDeletions += Math.floor(Math.random() * 50);
-          });
-
           // Calculate impact score (this is a simplified formula)
           // In a real app, you might use a more sophisticated algorithm
           const res = await fetch(`/api/score/${repo}/${contributor.login}`, {
@@ -146,7 +116,7 @@ export function RepositoryAnalyzerPage({
               contributions: contributor.contributions,
               additions: contributionScore.res[0]?.additions,
               deletions: contributionScore.res[0]?.deletions,
-              commits: commitsDataInfo,
+              commits: contributionScore.res[0]?.commits,
               impactScore: contributionScore.res[0]?.score,
             },
           ]);
@@ -296,7 +266,7 @@ export function RepositoryAnalyzerPage({
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
-                            {(contributor.commits as any[]).length}
+                            {contributor.commits}
                           </TableCell>
                           <TableCell className="text-right text-green-500">
                             +{contributor.additions}
@@ -331,6 +301,7 @@ export function RepositoryAnalyzerPage({
                       owner,
                       repo,
                       commitsData: contributor.commits,
+                      contributor,
                     }),
                   })
                 )

@@ -5,54 +5,39 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { computeReputationScoring } from "reputation-scoring";
 
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { owner, repo, commitsData, contributorsData } = body;
+    const { owner, repo, commitsData, contributor } = body;
+    console.log("test11", {
+      owner,
+      repo,
+      commitsData,
+      contributor,
+      url: `${baseUrl}/api/github/repos/${owner}/${repo}/commits?author=${contributor.login}&per_page=100`,
+    });
 
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get("github_session");
+    let commitsDataInfo: CommitData[] = [];
 
-    // const contributorsWithStats = await Promise.all(
-    //   contributorsData.map(async (contributor: any) => {
-    //     // Fetch commit stats for this contributor
-    //     const commitsResponse = await fetch(
-    //       `/api/github/repos/${owner}/${repo}/commits?author=${contributor.login}&per_page=100`
-    //     );
+    // Fetch commit stats for this contributor
+    const commitsResponse = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/commits?author=${contributor.login}&per_page=100`,
+      {
+        headers: {
+          Authorization: `token ${sessionCookie?.value}`,
+        },
+      }
+    );
 
-    //     if (!commitsResponse.ok) {
-    //       return {
-    //         ...contributor,
-    //         additions: 0,
-    //         deletions: 0,
-    //         commits: 0,
-    //         impactScore: 0,
-    //       };
-    //     }
+    console.log("test13", { commitsResponse });
 
-    //     const commitsDataInfo: CommitData[] = await commitsResponse.json();
-
-    //     // Calculate impact score (this is a simplified formula)
-    //     // In a real app, you might use a more sophisticated algorithm
-    //     const res = await fetch(`/api/score/${repo}`, {
-    //       method: "GET",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //     });
-    //     const contributionScore = await res.json();
-
-    //     return {
-    //       login: contributor.login,
-    //       avatar_url: contributor.avatar_url,
-    //       contributions: contributor.contributions,
-    //       additions: contributionScore.res.additions,
-    //       deletions: contributionScore.res.deletions,
-    //       commits: commitsDataInfo.length,
-    //       impactScore: contributionScore.res.score,
-    //     };
-    //   })
-    // );
+    if (!commitsResponse.ok) {
+      commitsDataInfo = [];
+    } else commitsDataInfo = await commitsResponse.json();
 
     const scoreInfo = await computeReputationScoring({
       owner,
@@ -65,17 +50,20 @@ export async function POST(request: Request) {
     );
 
     const { additions, deletions } = await fetchCommits(commitsData);
-    console.log({ additions, deletions });
+    console.log("test12", { additions, deletions, commitsDataInfo });
 
     const res = sql`SELECT * FROM public."Scores" WHERE repository = ${repo} AND owner = ${owner} AND username = ${score[0].user}`;
 
     if ((await res).length > 0) {
-      await sql`UPDATE public."Scores" SET score = ${score[0].score}, additions= ${additions}, deletions = ${deletions} WHERE repository = ${repo} AND username = ${commitsData[0].author.login}`;
+      await sql`UPDATE public."Scores" SET score = ${score[0].score}, additions= ${additions}, deletions = ${deletions}, commits = ${commitsDataInfo.length} WHERE repository = ${repo} AND username = ${commitsData[0].author.login}`;
     } else {
-      await sql`INSERT INTO public."Scores" (repository, owner, username, score, additions, deletions) VALUES (${repo}, ${owner}, ${score[0].user}, ${score[0].score}, ${additions}, ${deletions})`;
+      await sql`INSERT INTO public."Scores" (repository, owner, username, score, additions, deletions, commits) VALUES (${repo}, ${owner}, ${score[0].user}, ${score[0].score}, ${additions}, ${deletions}, ${commitsDataInfo.length})`;
     }
 
-    return NextResponse.json({ score, additions, deletions }, { status: 200 });
+    return NextResponse.json(
+      { score, additions, deletions, commitsDataInfo: commitsDataInfo.length },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("❌ Error fetching user:", error);
     return NextResponse.json(

@@ -18,6 +18,7 @@ export async function GET(
   const url = `https://api.github.com/${path}${
     searchParams ? `?${searchParams}` : ""
   }`;
+  console.log("url12", { url });
 
   try {
     const response = await fetch(url, {
