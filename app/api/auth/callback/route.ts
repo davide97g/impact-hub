@@ -80,7 +80,9 @@ export async function GET(request: NextRequest) {
 
     if (!yourAppInstalled) {
       // Redirect to install page
-      const installUrl = `https://github.com/apps/impact-hub-test/installations/new?redirect_uri=${process.env.NEXT_PUBLIC_APP_URL}/dashboard`;
+      const installUrl = `https://github.com/apps/impact-hub-test/installations/new?redirect_uri=${
+        process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+      }/dashboard`;
       return NextResponse.redirect(installUrl);
     }
 
