@@ -11,13 +11,6 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { owner, repo, commitsData, contributor } = body;
-    console.log("test11", {
-      owner,
-      repo,
-      commitsData,
-      contributor,
-      url: `${baseUrl}/api/github/repos/${owner}/${repo}/commits?author=${contributor.login}&per_page=100`,
-    });
 
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get("github_session");
@@ -33,8 +26,6 @@ export async function POST(request: Request) {
       }
     );
 
-    console.log("test13", { commitsResponse, author: contributor.login });
-
     if (!commitsResponse.ok) {
       commitsDataInfo = [];
     } else commitsDataInfo = await commitsResponse.json();
@@ -48,12 +39,6 @@ export async function POST(request: Request) {
     const score = scoreInfo.filter((item) => item.user === contributor.login);
 
     const { additions, deletions } = await fetchCommits(commitsData);
-    console.log("test12", {
-      additions,
-      deletions,
-      commitsDataInfo,
-      author: commitsData[0].author,
-    });
 
     const res = sql`SELECT * FROM public."Scores" WHERE repository = ${repo} AND owner = ${owner} AND username = ${score[0].user}`;
 

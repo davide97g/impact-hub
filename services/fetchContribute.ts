@@ -1,8 +1,6 @@
 import { CommitData, Stats } from "../types/api.types";
 
 export async function fetchCommits(commits: CommitData[]) {
-  console.log("test14", { commits });
-
   const commitsList: Stats[] = await Promise.all(
     commits.map((commit) =>
       fetch(commit.url, {
@@ -14,7 +12,6 @@ export async function fetchCommits(commits: CommitData[]) {
       }).then((res) => res.json())
     )
   );
-  console.log(commitsList);
 
   return {
     additions: commitsList.reduce(

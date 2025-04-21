@@ -8,7 +8,6 @@ export async function GET(
 ) {
   try {
     const { repo, user } = await params; // 📌 Ora l'ID è corretto
-    console.log({ repo, user });
 
     if (!repo) {
       return NextResponse.json(

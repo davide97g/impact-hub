@@ -18,7 +18,6 @@ export async function GET(
   const url = `https://api.github.com/${path}${
     searchParams ? `?${searchParams}` : ""
   }`;
-  console.log("url12", { url });
 
   try {
     const response = await fetch(url, {
@@ -29,7 +28,6 @@ export async function GET(
     });
 
     const data = await response.json();
-    console.log({ url, data });
 
     if (!response.ok) {
       return NextResponse.json(data, { status: response.status });

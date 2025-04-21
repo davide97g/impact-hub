@@ -52,8 +52,6 @@ export function RepositoryAnalyzerPage({
   const [repoDetails, setRepoDetails] = useState<any>(initialRepoDetails);
   const router = useRouter();
 
-  console.log({ contributors });
-
   useEffect(() => {
     if (initialContributors.length > 0) {
       analyzeContributors(initialContributors);
