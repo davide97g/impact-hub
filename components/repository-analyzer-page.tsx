@@ -20,7 +20,6 @@ import { ArrowLeft, Download, Github, RefreshCw, Webhook } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CommitData } from "../types/api.types";
-import { fetchCommits } from "@/services/fetchContribute";
 
 interface Contributor {
   login: string;
@@ -28,7 +27,7 @@ interface Contributor {
   contributions: number;
   additions: number;
   deletions: number;
-  commits: number;
+  commits: any;
   impactScore: number;
 }
 
@@ -48,13 +47,14 @@ export function RepositoryAnalyzerPage({
   const [contributors, setContributors] = useState<Contributor[]>([]);
   const [commitsData, setCommitsData] = useState<CommitData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [repoDetails, setRepoDetails] = useState<any>(initialRepoDetails);
   const router = useRouter();
 
-  useEffect(() => {
-    console.log({ initialContributors, initialRepoDetails });
+  console.log({ loading, isLoadingRefresh });
 
+  useEffect(() => {
     if (initialContributors.length > 0) {
       analyzeContributors(initialContributors);
     } else {
@@ -97,7 +97,7 @@ export function RepositoryAnalyzerPage({
   const analyzeContributors = async (contributorsData: any[]) => {
     try {
       // For each contributor, fetch additional stats
-      const contributorsWithStats = await Promise.all(
+      await Promise.all(
         contributorsData.map(async (contributor: any) => {
           // Fetch commit stats for this contributor
           const commitsResponse = await fetch(
@@ -117,9 +117,20 @@ export function RepositoryAnalyzerPage({
           const commitsDataInfo: CommitData[] = await commitsResponse.json();
           setCommitsData(commitsDataInfo);
 
+          // Calculate stats
+          let totalAdditions = 0;
+          let totalDeletions = 0;
+
+          // In a real app, you would fetch detailed stats for each commit
+          // For this demo, we'll use random values
+          commitsData.forEach(() => {
+            totalAdditions += Math.floor(Math.random() * 100);
+            totalDeletions += Math.floor(Math.random() * 50);
+          });
+
           // Calculate impact score (this is a simplified formula)
           // In a real app, you might use a more sophisticated algorithm
-          const res = await fetch(`/api/score/${repo}`, {
+          const res = await fetch(`/api/score/${repo}/${contributor.login}`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -127,24 +138,21 @@ export function RepositoryAnalyzerPage({
           });
           const contributionScore = await res.json();
 
-          return {
-            login: contributor.login,
-            avatar_url: contributor.avatar_url,
-            contributions: contributor.contributions,
-            additions: contributionScore.res.additions,
-            deletions: contributionScore.res.deletions,
-            commits: commitsDataInfo.length,
-            impactScore: contributionScore.res.score,
-          };
+          setContributors((prev) => [
+            ...prev,
+            {
+              login: contributor.login,
+              avatar_url: contributor.avatar_url,
+              contributions: contributor.contributions,
+              additions: contributionScore.res[0]?.additions,
+              deletions: contributionScore.res[0]?.deletions,
+              commits: commitsDataInfo,
+              impactScore: contributionScore.res[0]?.score,
+            },
+          ]);
         })
       );
 
-      // Sort by impact score
-      const sortedContributors = contributorsWithStats.sort(
-        (a: Contributor, b: Contributor) => b.impactScore - a.impactScore
-      );
-
-      setContributors(sortedContributors);
       setLoading(false);
     } catch (error) {
       console.error("Error analyzing contributors:", error);
@@ -246,77 +254,95 @@ export function RepositoryAnalyzerPage({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {loading || isLoadingRefresh ? (
             <div className="flex justify-center items-center py-8">
               <RefreshCw className="h-8 w-8 animate-spin" />
               <span className="ml-2">Analyzing repository...</span>
             </div>
-          ) : contributors.length === 0 ? (
-            <div className="text-center py-4">No contributors found</div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Contributor</TableHead>
-                  <TableHead className="text-right">Commits</TableHead>
-                  <TableHead className="text-right">Additions</TableHead>
-                  <TableHead className="text-right">Deletions</TableHead>
-                  <TableHead className="text-right">Impact Score</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {contributors.map((contributor) => (
-                  <TableRow key={contributor.login}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center">
-                        <img
-                          src={contributor.avatar_url || "/placeholder.svg"}
-                          alt={contributor.login}
-                          className="w-8 h-8 rounded-full mr-2"
-                        />
-                        {contributor.login}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {contributor.commits}
-                    </TableCell>
-                    <TableCell className="text-right text-green-500">
-                      +{contributor.additions}
-                    </TableCell>
-                    <TableCell className="text-right text-red-500">
-                      -{contributor.deletions}
-                    </TableCell>
-                    <TableCell className="text-right font-bold">
-                      {contributor.impactScore}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <>
+              {contributors.length === 0 && (
+                <div className="text-center py-4">No contributors found</div>
+              )}
+              {contributors.length > 0 && (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Contributor</TableHead>
+                      <TableHead className="text-right">Commits</TableHead>
+                      <TableHead className="text-right">Additions</TableHead>
+                      <TableHead className="text-right">Deletions</TableHead>
+                      <TableHead className="text-right">Impact Score</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {contributors
+                      .sort(
+                        (a: Contributor, b: Contributor) =>
+                          b.impactScore - a.impactScore
+                      )
+                      .map((contributor) => (
+                        <TableRow key={contributor.login}>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center">
+                              <img
+                                src={
+                                  contributor.avatar_url || "/placeholder.svg"
+                                }
+                                alt={contributor.login}
+                                className="w-8 h-8 rounded-full mr-2"
+                              />
+                              {contributor.login}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {(contributor.commits as any[]).length}
+                          </TableCell>
+                          <TableCell className="text-right text-green-500">
+                            +{contributor.additions}
+                          </TableCell>
+                          <TableCell className="text-right text-red-500">
+                            -{contributor.deletions}
+                          </TableCell>
+                          <TableCell className="text-right font-bold">
+                            {contributor.impactScore}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              )}
+            </>
           )}
         </CardContent>
         <CardFooter className="flex justify-end gap-2">
           <Button
             onClick={() => {
-              setLoading(true);
-              fetch(`/api/update-score`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  owner,
-                  repo,
-                  commitsData,
-                }),
-              })
-                .then((res) => res.json())
-                .then((data) => {
-                  console.log({ data });
+              setIsLoadingRefresh(true);
+
+              Promise.all(
+                contributors.map((contributor) =>
+                  fetch(`/api/update-score`, {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      owner,
+                      repo,
+                      commitsData: contributor.commits,
+                    }),
+                  })
+                )
+              )
+                .then(() => {
+                  setContributors([]);
+                })
+                .then(() => {
+                  fetchContributors();
                 })
                 .finally(() => {
-                  setLoading(false);
-                  fetchContributors();
+                  setIsLoadingRefresh(false);
                 });
             }}
           >
@@ -325,12 +351,15 @@ export function RepositoryAnalyzerPage({
           </Button>
           <Button
             onClick={handleExportJSON}
-            disabled={loading || contributors.length === 0}
+            disabled={loading || isLoadingRefresh || contributors.length === 0}
           >
             <Download className="h-4 w-4 mr-2" />
             Export as JSON
           </Button>
-          <Button onClick={handleCreateWebhook} disabled={loading}>
+          <Button
+            onClick={handleCreateWebhook}
+            disabled={loading || isLoadingRefresh}
+          >
             <Webhook className="h-4 w-4 mr-2" />
             Create Webhook
           </Button>

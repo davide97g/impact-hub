@@ -28,6 +28,7 @@ export async function GET(
     });
 
     const data = await response.json();
+    console.log({ url, data });
 
     if (!response.ok) {
       return NextResponse.json(data, { status: response.status });
