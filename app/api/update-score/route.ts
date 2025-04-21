@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       }
     );
 
-    console.log("test13", { commitsResponse });
+    console.log("test13", { commitsResponse, author: contributor.login });
 
     if (!commitsResponse.ok) {
       commitsDataInfo = [];
@@ -45,17 +45,20 @@ export async function POST(request: Request) {
       token: sessionCookie?.value,
     });
 
-    const score = scoreInfo.filter(
-      (item) => item.user === commitsData[0].author.login
-    );
+    const score = scoreInfo.filter((item) => item.user === contributor.login);
 
     const { additions, deletions } = await fetchCommits(commitsData);
-    console.log("test12", { additions, deletions, commitsDataInfo });
+    console.log("test12", {
+      additions,
+      deletions,
+      commitsDataInfo,
+      author: commitsData[0].author,
+    });
 
     const res = sql`SELECT * FROM public."Scores" WHERE repository = ${repo} AND owner = ${owner} AND username = ${score[0].user}`;
 
     if ((await res).length > 0) {
-      await sql`UPDATE public."Scores" SET score = ${score[0].score}, additions= ${additions}, deletions = ${deletions}, commits = ${commitsDataInfo.length} WHERE repository = ${repo} AND username = ${commitsData[0].author.login}`;
+      await sql`UPDATE public."Scores" SET score = ${score[0].score}, additions= ${additions}, deletions = ${deletions}, commits = ${commitsDataInfo.length} WHERE repository = ${repo} AND username = ${contributor.login}`;
     } else {
       await sql`INSERT INTO public."Scores" (repository, owner, username, score, additions, deletions, commits) VALUES (${repo}, ${owner}, ${score[0].user}, ${score[0].score}, ${additions}, ${deletions}, ${commitsDataInfo.length})`;
     }
