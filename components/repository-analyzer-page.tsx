@@ -110,35 +110,6 @@ export function RepositoryAnalyzerPage({
 
       const cotributorsWithStats = await Promise.all(
         contributorsData.map(async (contributor: any) => {
-          // Fetch commit stats for this contributor
-          const commitsResponse = await fetch(
-            `/api/github/repos/${owner}/${repo}/commits?author=${contributor.login}&per_page=100`
-          );
-
-          if (!commitsResponse.ok) {
-            return {
-              ...contributor,
-              additions: 0,
-              deletions: 0,
-              commits: 0,
-              impactScore: 0,
-            };
-          }
-
-          const commitsDataInfo: CommitData[] = await commitsResponse.json();
-          setCommitsData(commitsDataInfo);
-
-          // Calculate stats
-          let totalAdditions = 0;
-          let totalDeletions = 0;
-
-          // In a real app, you would fetch detailed stats for each commit
-          // For this demo, we'll use random values
-          commitsData.forEach(() => {
-            totalAdditions += Math.floor(Math.random() * 100);
-            totalDeletions += Math.floor(Math.random() * 50);
-          });
-
           // Calculate impact score (this is a simplified formula)
           // In a real app, you might use a more sophisticated algorithm
           const res = await fetch(`/api/score/${repo}/${contributor.login}`, {
@@ -345,9 +316,6 @@ export function RepositoryAnalyzerPage({
                     body: JSON.stringify({
                       owner,
                       repo,
-                      commitsData: commitsData.filter(
-                        (commit) => commit.author.login === contributor.login
-                      ),
                       contributor,
                     }),
                   })

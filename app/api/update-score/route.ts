@@ -1,5 +1,6 @@
 import { sql } from "@/app/(config)/postgres";
 import { fetchCommits } from "@/services/fetchContribute";
+import { CommitData } from "@/types/api.types";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { computeReputationScoring } from "reputation-scoring";
@@ -7,10 +8,27 @@ import { computeReputationScoring } from "reputation-scoring";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { owner, repo, commitsData, contributor } = body;
+    const { owner, repo, contributor } = body;
 
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get("github_session");
+
+    const commitsResponse = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/commits?author=${contributor.login}&per_page=100`
+    );
+
+    if (!commitsResponse.ok) {
+      return {
+        ...contributor,
+        additions: 0,
+        deletions: 0,
+        commits: 0,
+        impactScore: 0,
+      };
+    }
+
+    const commitsData: CommitData[] = await commitsResponse.json();
+    console.log({ commitsData });
 
     const scoreInfo = await computeReputationScoring({
       owner,
