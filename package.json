@@ -21,7 +21,7 @@
     "postgres": "^3.4.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "reputation-scoring": "^0.0.4",
+    "reputation-scoring": "0.3.0-beta.5",
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.7"
   },

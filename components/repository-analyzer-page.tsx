@@ -19,7 +19,6 @@ import {
 import { ArrowLeft, Download, Github, RefreshCw, Webhook } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { CommitData } from "../types/api.types";
 
 interface Contributor {
   login: string;
@@ -45,7 +44,6 @@ export function RepositoryAnalyzerPage({
   initialContributors,
 }: Readonly<RepositoryAnalyzerPageProps>) {
   const [contributors, setContributors] = useState<Contributor[]>([]);
-  const [commitsData, setCommitsData] = useState<CommitData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

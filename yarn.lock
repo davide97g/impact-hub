@@ -2536,7 +2536,7 @@ __metadata:
     postgres: "npm:^3.4.5"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
-    reputation-scoring: "npm:^0.0.4"
+    reputation-scoring: "npm:0.3.0-beta.5"
     tailwind-merge: "npm:^1.14.0"
     tailwindcss: "npm:^4.1.4"
     tailwindcss-animate: "npm:^1.0.7"
@@ -3785,12 +3785,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"reputation-scoring@npm:^0.0.4":
-  version: 0.0.4
-  resolution: "reputation-scoring@npm:0.0.4"
+"reputation-scoring@npm:0.3.0-beta.5":
+  version: 0.3.0-beta.5
+  resolution: "reputation-scoring@npm:0.3.0-beta.5"
   dependencies:
     octokit: "npm:^4.1.2"
-  checksum: 10c0/7651c7c1f71bb7f94f795d3da749fafc0916abab009965f68b8164e090d5db779ad5432d7665bd9b55c5ccda8fcfe79cb0a3a25f435701b56ccd33974b1aaa51
+  checksum: 10c0/eea9de9c39f556deb79da97945e11c3bdf3e27add63ac27913fdd98872ed4e0a3de689e8d502ea138457d3c2bedff1e6f916a714e7cd1b0a6f78418b8e68105b
   languageName: node
   linkType: hard
 
