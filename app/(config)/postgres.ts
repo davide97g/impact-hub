@@ -1,10 +1,10 @@
 import postgres from "postgres";
 
-const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.NEXT_DATABASE_URL;
 
 if (!connectionString) {
   throw new Error(
-    "Please define the DATABASE_URL environment variable inside .env.local"
+    "Please define the NEXT_DATABASE_URL environment variable inside .env.local"
   );
 }
 
