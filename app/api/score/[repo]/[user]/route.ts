@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: Promise<{ repo: string; user: string }> }
 ) {
   try {
-    const { repo, user } = await params; // 📌 Ora l'ID è corretto
+    const { repo, user } = await params;
 
     if (!repo) {
       return NextResponse.json(
