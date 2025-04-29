@@ -12,7 +12,7 @@ jobs:
       GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      NEXT_DATABASE_URL: ${{ secrets.NEXT_DATABASE_URL }}
     steps:
       - uses: actions/checkout@v2
       - name: Corepack
