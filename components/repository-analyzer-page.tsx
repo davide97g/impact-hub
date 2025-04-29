@@ -50,18 +50,8 @@ export function RepositoryAnalyzerPage({
   const [repoDetails, setRepoDetails] = useState<any>(initialRepoDetails);
   const router = useRouter();
 
-  console.log({
-    contributors,
-    loading,
-    isLoadingRefresh,
-    initialContributors,
-    initialRepoDetails,
-  });
-
   useEffect(() => {
     if (initialContributors.length > 0) {
-      console.log("1");
-
       analyzeContributors(initialContributors);
     } else {
       fetchContributors();
@@ -91,7 +81,6 @@ export function RepositoryAnalyzerPage({
         throw new Error("Failed to fetch contributors");
       }
       const contributorsData = await contributorsResponse.json();
-      console.log("2");
 
       analyzeContributors(contributorsData);
     } catch (error) {
@@ -104,7 +93,6 @@ export function RepositoryAnalyzerPage({
   const analyzeContributors = async (contributorsData: any[]) => {
     try {
       // For each contributor, fetch additional stats
-      console.log({ contributorsData });
 
       const cotributorsWithStats = await Promise.all(
         contributorsData.map(async (contributor: any) => {
@@ -117,7 +105,6 @@ export function RepositoryAnalyzerPage({
             },
           });
           const contributionScore = await res.json();
-          console.log({ contributors });
 
           return {
             login: contributor.login,
