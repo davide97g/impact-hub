@@ -1,9 +1,8 @@
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { ArrowLeft, Github } from "lucide-react";
 import Link from "next/link";
-import { ArrowLeft, Github, Plus } from "lucide-react";
 
+import { ConnectRepoDialog } from "@/components/connect-repo-dialog";
+import { RepositoryAnalyzerPage } from "@/components/repository-analyzer-page";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,11 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ConnectRepoDialog } from "@/components/connect-repo-dialog";
 import { cookies } from "next/headers";
-import { DashboardPage } from "@/components/dashboard-page";
-import { RepositoryAnalyzerPage } from "@/components/repository-analyzer-page";
 
 export default async function ProjectPage({
   params,

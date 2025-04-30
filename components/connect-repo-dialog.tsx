@@ -2,9 +2,9 @@
 
 import type React from "react";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Github, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,18 +17,17 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { cookies } from "next/headers";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 export function ConnectRepoDialog({
   children,
   sessionCookie,
   projectId,
-}: {
+}: Readonly<{
   children: React.ReactNode;
   sessionCookie: RequestCookie | undefined;
   projectId: string;
-}) {
+}>) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");

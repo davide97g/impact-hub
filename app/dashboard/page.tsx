@@ -1,16 +1,15 @@
-import Link from "next/link";
 import { PlusCircle } from "lucide-react";
+import Link from "next/link";
 
+import { CreateProjectDialog } from "@/components/create-project-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CreateProjectDialog } from "@/components/create-project-dialog";
 import { cookies } from "next/headers";
 
 export default async function Dashboard() {
