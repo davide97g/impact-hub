@@ -50,7 +50,7 @@ export default async function Dashboard() {
             Gestisci i tuoi progetti e le integrazioni GitHub
           </p>
         </div>
-        <CreateProjectDialog sessionCookie={sessionCookie}>
+        <CreateProjectDialog>
           <Button>
             <PlusCircle className="mr-2 h-4 w-4" />
             Nuovo Progetto

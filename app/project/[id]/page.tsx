@@ -100,7 +100,7 @@ export default async function ProjectPage({
               </CardDescription>
             </CardHeader>
             <CardContent className="flex justify-center">
-              <ConnectRepoDialog sessionCookie={sessionCookie} projectId={id}>
+              <ConnectRepoDialog projectId={id}>
                 <Button>
                   <Github className="mr-2 h-4 w-4" />
                   Collega Repository
@@ -111,7 +111,7 @@ export default async function ProjectPage({
         </div>
       ) : (
         <RepositoryAnalyzerPage
-          owner={project.user_id}
+          owner={project.owner}
           repo={project.repo_name}
           initialRepoDetails={repoDetails}
           initialContributors={contributors}

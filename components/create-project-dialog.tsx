@@ -2,8 +2,8 @@
 
 import type React from "react";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,16 +17,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { cookies } from "next/headers";
-import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 export function CreateProjectDialog({
   children,
-  sessionCookie,
 }: Readonly<{
   children: React.ReactNode;
-  sessionCookie: RequestCookie | undefined;
 }>) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,11 +32,7 @@ export function CreateProjectDialog({
     e.preventDefault();
     setIsLoading(true);
 
-    const userResponse = await fetch("https://api.github.com/user", {
-      headers: {
-        Authorization: `token ${sessionCookie?.value}`,
-      },
-    });
+    const userResponse = await fetch("api/github/user");
 
     const userData = await userResponse.json();
 

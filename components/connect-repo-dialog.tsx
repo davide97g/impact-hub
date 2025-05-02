@@ -17,15 +17,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 export function ConnectRepoDialog({
   children,
-  sessionCookie,
   projectId,
 }: Readonly<{
   children: React.ReactNode;
-  sessionCookie: RequestCookie | undefined;
   projectId: string;
 }>) {
   const [open, setOpen] = useState(false);
@@ -36,12 +33,7 @@ export function ConnectRepoDialog({
 
   const fetchRepositories = async () => {
     const reposResponse = await fetch(
-      "https://api.github.com/user/repos?sort=updated&per_page=10",
-      {
-        headers: {
-          Authorization: `token ${sessionCookie?.value}`,
-        },
-      }
+      "/api/github/user/repos?sort=updated&per_page=10"
     );
 
     const repositories = await reposResponse.json();
