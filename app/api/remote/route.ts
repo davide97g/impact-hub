@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       token: process.env.GITHUB_TOKEN,
     });
 
-    await sql`INSERT INTO public."Scores" (owner, repository, username, score) VALUES ${scores
+    await sql`INSERT INTO public."Scores" (owner, repository, username, score) VALUES ${scores.userScores
       .map(
         (score) =>
           `('${payload.repository.owner.login}', '${payload.repository.name}', '${score.user}', ${score.score})`
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       success: true,
       message: `Updated ${githubEvent} webhook for ${
         payload.repository.name
-      }: ${scores.map((score) => `${score.user}: ${score.score}`)}`,
+      }: ${scores.userScores.map((score) => `${score.user}: ${score.score}`)}`,
     });
   } catch (error) {
     console.error("Error processing webhook:", error);

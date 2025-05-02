@@ -3,22 +3,21 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   _: NextRequest,
-  { params }: { params: Promise<{ repo: string; user: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { repo, user } = await params;
+    const { id } = await params;
 
-    if (!repo) {
+    if (!id) {
       return NextResponse.json(
-        { error: "Missing repo ID parameter" },
+        { error: "Missing project ID parameter" },
         { status: 400 }
       );
     }
 
-    const res =
-      await sql`SELECT * FROM public."Scores" WHERE repository = ${repo} AND username = ${user}`;
+    const res = await sql`SELECT * FROM public."Projects" WHERE id = ${id} `;
 
-    return NextResponse.json({ res: res }, { status: 200 });
+    return NextResponse.json(res[0], { status: 200 });
   } catch (error) {
     console.error("❌ Error fetching user:", error);
     return NextResponse.json(
