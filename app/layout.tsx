@@ -25,7 +25,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="it" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body
+        className={`${inter.className} h-full 
+`}
+      >
         <Suspense>
           <ThemeProvider
             attribute="class"
