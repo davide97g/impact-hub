@@ -1,6 +1,9 @@
 import { ArrowLeft, Github } from "lucide-react";
 import Link from "next/link";
 
+import { ActivityChart } from "@/components/chart/activity-chart";
+import { CodeDistributionChart } from "@/components/chart/code-distributions-chart";
+import { ContributionsChart } from "@/components/chart/contributions-chart";
 import { ConnectRepoDialog } from "@/components/connect-repo-dialog";
 import { RepositoryAnalyzerPage } from "@/components/repository-analyzer-page";
 import { Button } from "@/components/ui/button";
@@ -11,19 +14,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { cookies } from "next/headers";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ActivityChart } from "@/components/chart/activity-chart";
-import { ContributionsChart } from "@/components/chart/contributions-chart";
-import { CodeDistributionChart } from "@/components/chart/code-distributions-chart";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { cookies } from "next/headers";
 
 export default async function ProjectPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
   const cookieStore = await cookies();
