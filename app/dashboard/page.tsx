@@ -42,8 +42,8 @@ export default async function Dashboard() {
   }[] = await projectsResponse.json();
 
   return (
-    <div className="container py-10">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-10 w-full">
+      <div className="w-full flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Progetti</h1>
           <p className="text-muted-foreground mt-1">

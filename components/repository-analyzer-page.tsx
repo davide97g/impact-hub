@@ -16,8 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeft, Download, Github, RefreshCw, Webhook } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Download, Github, RefreshCw, Webhook } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface Contributor {
@@ -48,7 +47,6 @@ export function RepositoryAnalyzerPage({
   const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [repoDetails, setRepoDetails] = useState<any>(initialRepoDetails);
-  const router = useRouter();
 
   useEffect(() => {
     if (initialContributors.length > 0) {
@@ -185,17 +183,8 @@ export function RepositoryAnalyzerPage({
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8">
       <div className="flex items-center mb-8">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => router.push("/dashboard")}
-          className="mr-4"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Dashboard
-        </Button>
         <div className="flex items-center">
           <Github className="h-6 w-6 mr-2" />
           <h1 className="text-2xl font-bold">

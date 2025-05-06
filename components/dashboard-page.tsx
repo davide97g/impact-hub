@@ -92,7 +92,7 @@ export function DashboardPage({
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 h-full">
       <div className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-2">
           <Image
