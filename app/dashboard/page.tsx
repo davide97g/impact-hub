@@ -24,6 +24,14 @@ export default async function Dashboard() {
 
   const userData = await userResponse.json();
 
+  await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/users`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ user: userData.login, name: userData.name }),
+  });
+
   const projectsResponse = await fetch(
     `${process.env.NEXT_PUBLIC_APP_URL}/api/projects/${userData.login}`,
     {
